@@ -1,3 +1,5 @@
-#Factory Girl
+#lightning-talks
 
-Lightning Talk slides about a few powerful features of Factory Girl.
+Repo for Lightning Talk presentations and code examples
+
+Hopefully more to come shortly!
