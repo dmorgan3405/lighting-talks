@@ -52,3 +52,7 @@ Living in an Active Record World
 			email { "#{first_name}.#{last_name}@example.com" }
 		end
 	end
+
+## Associations
+	
+	# TODO
