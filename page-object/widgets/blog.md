@@ -1,111 +1,154 @@
-Adding Custom Element Widgets to Page Object
+#PageObject::Widgets
 
-First things first. 
+Creating Custom Element Widgets to use with Page Object
 
-Why would I want to do this?
+## First things first. Why?
 
 JavaScript has made it easier for developers to create custom controls that go above and beyond the behavior that only a single html element can provide. 
 
-Libraries such jquery ui widgets and kendo ui offer example of these controls.
+Libraries such jquery ui widgets and kendo ui offer an example of such controls.
 
 Testing these controls can involve a few things:
-	- Complex wait conditions
-	- Knowledge of hidden html elements
-	- Knowlegde of multiple html elements
 
-This leads to duplication of this logic in across the test suite where these elements are used. 
+* Complex wait conditions
+* Knowledge of hidden html elements
+* Knowlegde of multiple html elements
 
-Using a widget allows us to encapsulate this behavior and make our tests more readable.  
+This leads to duplication of this logic across the test suite where these elements are used. 
+Using a widget allows you to encapsulate this behavior and reduce the amount of duplication.  
 
+## Where to start?
 
-________________________________________________________________________________________________________________________________________
+All widgets need to include **PageObject::Elements::Element** in its ancestry.
 
-As a simple example, lets say we have a telephone number control.  #Maybe? Can I think of a better simple example
+Therefore a good place to start is deciding what html best represents the new control 
+and then create a new class
 
-To start, we need to choose which html element that best represents the new control. 
-
-Defining our new element. 
-
-	class MyNewElemenet < PageObject::Elements::Div
+```ruby
+	class AutoComplete < PageObject::Elements::TextField
 
 	end
+```
 
-Regestering our new widget with PageObject 
+## Registration
 
-	PageObject.register_widget(:my_new_element, MyNewElement, 'div')
+Adding the widget is straight forward. The three pieces of infomation you need are:
 
-Now you could define your new element in any of your page objects, as if it was any other html element
+* widget_tag => name to define widget accessor method as
+* widget_class => class where widget is defined
+* base_element_tag => tag of the element the widget inherits
 
-class MyPage
+```ruby
+	PageObject.register_widget(:auto_complete, AutoComplete, 'text_Field')
+```
+
+## Usage
+
+```ruby
+class TestPage
 	include PageObject
 
-	my_new_element(:new, :id => 'MyElement')
+	auto_complete(:city, :id => 'City')
 
 end
+```
 
 This will define two methods we can use with in our page, 
 
-	new_element - this will return the element as usual
+	city_element - this will return an instance of **PageObject::Elements::TextField**
 
-	new? - returns wheter or not the element exists
+	city? - returns whether or not the element exists
 
-#This is a reminder that page object defines methods for us based on our elements names, it does not create variables that we reference. 
+**For a more indepth look at the standard accessor methods checkout accessor_blog.md
 
 
-So now that we have struture for our new element, lets add some more behavior.
+## Adding Behaviour
 
+Thus far, adding a new widget will not add much value. 
+
+Lets change that, here are the ways to add behaviour to the widget.
+
+## Accessor Methods
 
 One way we can do this is by defining a class level method in our new elements class
 
-class MyNewElemenet < PageObject::Elements::Div
+```ruby
+class AutoComplete < PageObject::Elements::TextField
 
 	def self.accessor_methods(accessor, name)
 
-		#defines an accessor method name= that allows you to set the value 
-		accessor.send :define_method, "#{name}=" do |amounts|
-	    	container = self.send("#{name}_element")
-	        text_fields = container.text_field_elements
-
-	        #this
-	        text_fields.each_with_index do |text_field, index|
-	        	text_field.value = amounts[index]
-	        end
-
-	        #or
-	        text_fields.zip(amounts) do |text_field, amount|
-	        	text_field.value(amount)
-	        end
+		accessor.send :define_method, "#{name}=" do |value|
+	        #code for desired behaviour
 	    end
+
+	    accessor.send :define_method, "#{name}" do |value|
+	        #code for desired behaviour
+	    end
+
+	    #...
+
 	end
 
 end
+```
 
-The other way is by adding an instance method.
+This will define the "#{name}=", and "#{name}".
 
-class MyNewElemenet < PageObject::Elements::Div
+## Lets think meta
 
-	def set(amounts)
-	    #this
-	    self.text_field_elements.each_with_index do |text_field, index|
-	    	text_field.value = amounts[index]
+Calling other methods on the element, and interacting with the element is not as stright forward as normal
+since the methods are dynamically generated based on the element name.
+
+So inorder to interact with the element we need to think meta. 
+
+```ruby
+	def self.accessor_methods(accessor, name)
+
+		accessor.send :define_method, "#{name}=" do |value|
+			self.send("#{name}_element")
 	    end
 
-	    #or
-	    self.text_field_elements.zip(amounts) do |text_field, amount|
-	    	text_field.value(amount)
-	    end
+	end
+```
+
+In the above code example, the *self.send("#{name}_element")* is the interesting piece, because
+self in the context of the define_method block is actually the object in which the accessor method was called on. 
+
+## Huh? #metaprogramming
+
+All this means is that in the example below, self is an instance of TestPage.
+
+```ruby
+class TestPage
+	include PageObject
+
+	auto_complete(:city, :id => 'City')
+
+end
+```
+
+##The other way
+
+Sometimes using the accessor methods is not a viable option, because we need to locat the element dynamically in a table.
+
+To add behavior to the an instance of a class, simply add instance methods 
+
+```ruby
+class AutoComplete < PageObject::Elements::TextField
+
+	def set(value)
+	    #code for desired behaviour
 	end
 
 end
+```
 
+## Gotchas
 
-this would allow me to find my element dynamically on a page. (ex. in a table row)
+You should define dynamically created methods with name being part of the method name
 
-table_row  = my_table[0]
+	ex. "#{name}_options"
 
-table_row.my_new_element.set([867,5309])
+Failing to do so will result in runtime errors when you attempt to define two of the same widget in a PageObject
 
-
-If you want to dig into how pag object allows this behaviour it is located in the wigets.rb class. 
-
-#metaprogramming #open/closed
+Sharing behaviour between dynamically defined methods and instance methods can be done with class level methods.
