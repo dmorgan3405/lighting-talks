@@ -1,49 +1,78 @@
+# PageObject::Accessors.rb
 
-	The methods that are defined in the accessors module, enable us to ask questions about the elements we define in our PageObject.
+## Understanding basic usage
 
-	text_field(name, identifier={:index => 0}, &block)
+To take advantage of these methods, including the PageObject module is all that is needed.
 
-	example usage:
+```ruby
+class LoginPage
+	include PageObject
 
-	class MyPage
-		include PageObject
+	text_field(:username, :id => 'Username')
+end
 
-		#this runs when Mypage.new is called!!!!
-		text_field(:my_text_field, :id => 'myTextField')
+```
 
+Now from a step definition, you can do the following
+
+```ruby
+	on_page(LoginPage).username = 'user1' 	#sets the text field value
+	on_page(LoginPage).username				#gets the current value	
+```
+
+This is fairly basic, but having a good idea of how to properly use these methods can help keep your pages clean. 
+For a better understanding of the usage consider buying a copy of [Cucumber & Cheese ](https://leanpub.com/cucumber_and_cheese) or for a brief intro checkout [PageObjects wiki on Github](https://github.com/cheezy/page-object/wiki/Get-me-started-right-now!)
+
+## Questions, not state
+
+An important topic to note, is that the **PageObject::Accessors** methods enable us to ask questions about the elements current state.
+
+In other words, the object itself has no element state. It only knows how to go about retrieveing it. 
+
+## Dynamic Methods
+
+Each element accesor dynamically defines a set of methods that include the name of the element you are defining.
+
+```ruby
+	def text_field(name, identifier={:index => 0}, &block) 
+      standard_methods(name, identifier, 'text_field_for', &block)
+      define_method(name) do
+        return platform.text_field_value_for identifier.clone unless block_given?
+        self.send("#{name}_element").value
+      end
+      define_method("#{name}=") do |value|
+        return platform.text_field_value_set(identifier.clone, value) unless block_given?
+        self.send("#{name}_element").value = value
+      end
 	end
+```
 
-	Each element accesor dynamically defines a set of methods that include the name of the element you are defining.
+"#{name}", "#{name}=", "#{name}_element","#{name}?" are just a few examples. (For more on specific elements dive into **PageObject::Accessors**.rb)
 
-	"#{name}", "#{name}=", "#{name}_element","#{name}?" are just a few examples. (Look in the Accessor.rb file to see what is defined for a certain element)
+It is also important to note, the methods these dynamically defined methods are added on to object calling the method. 
 
-	It is also important to note, the methods that are defined are defined on the MyPage class. 
-	
-	This is why we are able to call on_page(MyPage).my_text_field from the step definitions. 
+This is why we are able to call on_page(LoginPage).username from the step definition. 
 
-	## Further More (How is this accomplished)
-	This is the case because the accessor methods are defined in a module within the PageObject module, 
-	The PageObject module has been included in our MyPage class. (Ruby calls this a mixin)
-	Therefore the context in which the methods are added, is the instance of the MyPage class. 
-	Or more simply put self = the instance of MyPage. 
-	##
+## How is this accomplished
 
-	The most interesting method that is defined (in my opinion), is the "#{name}_element".
+Ruby has meta programming features. (such as the send and define_method functions)
 
-	This returns us an instance of the corresponding element class. (These classes can be found in the element folder in the PageObject Module)
-	
-	*In the example, my_text_field_element returns an instance of the PageObject::ElementsTextField class. 
+Since the PageObject module has been included in our class the 'self' context in which the methods are defined is the instance of the MyPage class. 
 
-	The preference is to us the defined methods from the accessors to enhance the readability of the code. 
+## define_method "#{name}_element"
 
-	##Meaningful names
+This method returns an instance of the corresponding PageObject::Elements class. 
+In the example, *username_element* returns an instance of the **PageObject::Elements::TextField** class.
+Having access to the PageObject element allows us to ask additional state questions, and allows the PageObject to encapsulate complex element behaviors.
 
-	This means the names we give our elements should be meaningful! 
+My preference is to us the defined accessor methods, when available, versus directly accessing the element.
+I prefer using this methods to enhance the readability of the code and decrease the amount the code written. 
 
-	In the example I used the name :my_text_field, to put it blunt it is not a good name. 
+## Meaningful names
 
-	I should have been more descriptive about the behavior of that text field, what is its purpose. 
+This means the names we give our elements should be meaningful! 
 
-	Lets say we have a text field for a material we are adding to a price list! (We never have done that right?)
+To me a good element, is describing the bevhavior not the type. 
 
-	A good name would be :material or :added_material, i think a better name would be material_to_add. Any other suggestions?
+Lets say we have a text field for a material we are adding to a price list. 
+A good name would be :material or :add_material, i think a better name would be :material_to_add.
