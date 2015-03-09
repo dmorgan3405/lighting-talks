@@ -29,7 +29,7 @@ Living in an Active Record World
 	
 	#Provide the name of the attribute to ignore and a default value.
 	
-	ignore do
+	transient do
       quality ''
       entity ''
     end
@@ -56,3 +56,12 @@ Living in an Active Record World
 ## Associations
 	
 	# TODO
+
+## Traits
+
+## Callbacks
+
+	after(:build) 
+	before(:create) 
+	after(:create) 
+	after(:stub) 
