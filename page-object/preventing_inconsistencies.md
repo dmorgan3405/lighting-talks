@@ -29,6 +29,8 @@ It it a little simpler and also it also protects us as developers from having to
 
 Widgets allow us to encapsulate generic behaviour of ui controls. 
 
+For example, always clicking a kendo select list opener and waiting for the options container to be visible before you select a value. 
+
 Some things to keep in mind when:
 
 * Adding or changing behaviour of a widget can have far reaching effects. 
