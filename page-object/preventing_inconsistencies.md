@@ -37,7 +37,7 @@ Some things to keep in mind when:
 	* Is this generic behaviour for this control?
 	* Or is this behaviour unique to the page I am working on?
 
-* Creating a new widget vs editing an existing widget should be a thought out indevaour. 
+* Creating a new widget vs editing an existing widget should be a thought out endeavour. 
 	* Overgeneralizing a widget, can lead to complex logic. 
 	* Creating new widgets can lead to duplication. 
 
