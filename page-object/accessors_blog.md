@@ -6,9 +6,9 @@ To take advantage of these methods, including the PageObject module is all that 
 
 ```ruby
 class LoginPage
-	include PageObject
+  include PageObject
 
-	text_field(:username, :id => 'Username')
+  text_field(:username, :id => 'Username')
 end
 
 ```
@@ -16,8 +16,8 @@ end
 Now from a step definition, you can do the following
 
 ```ruby
-	on_page(LoginPage).username = 'user1' #sets the text field value
-	on_page(LoginPage).username		   #gets the current value	
+  on(LoginPage).username = 'user1' #sets the text field value
+  on(LoginPage).username       #gets the current value  
 ```
 
 This is fairly basic, but having a good idea of how to properly use these methods can help keep your pages clean. 
@@ -34,7 +34,7 @@ In other words, the object itself has no element state. It only knows how to go 
 Each element accesor dynamically defines a set of methods that include the name of the element you are defining.
 
 ```ruby
-	def text_field(name, identifier={:index => 0}, &block) 
+  def text_field(name, identifier={:index => 0}, &block) 
       standard_methods(name, identifier, 'text_field_for', &block)
       define_method(name) do
         return platform.text_field_value_for identifier.clone unless block_given?
@@ -44,7 +44,7 @@ Each element accesor dynamically defines a set of methods that include the name 
         return platform.text_field_value_set(identifier.clone, value) unless block_given?
         self.send("#{name}_element").value = value
       end
-	end
+  end
 ```
 
 "#{name}", "#{name}=", "#{name}_element","#{name}?" are just a few examples.
@@ -67,7 +67,7 @@ This method returns an instance of the corresponding PageObject::Elements class.
 In the example, *username_element* returns an instance of the **PageObject::Elements::TextField** class.
 Having access to the PageObject element allows us to ask additional state questions, and allows the PageObject to encapsulate complex element behaviors.
 
-My preference is to us the defined accessor methods, when available, versus directly accessing the element.
+My preference is to use the defined accessor methods, when available, versus directly accessing the element.
 I prefer using this methods to enhance the readability of the code and decrease the amount the code written. 
 
 ## Meaningful names

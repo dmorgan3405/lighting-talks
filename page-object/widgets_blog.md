@@ -129,9 +129,9 @@ end
 
 ##The other way
 
-Sometimes using the accessor methods is not a viable option, because we need to locat the element dynamically in a table.
+Sometimes using the accessor methods is not a viable option, because we need to locate the element dynamically in a table.
 
-To add behavior to the an instance of a class, simply add instance methods 
+To add behavior to an instance of a class, simply add instance methods 
 
 ```ruby
 class AutoComplete < PageObject::Elements::TextField
@@ -152,3 +152,28 @@ You should define dynamically created methods with name being part of the method
 Failing to do so will result in runtime errors when you attempt to define two of the same widget in a PageObject
 
 Sharing behaviour between dynamically defined methods and instance methods can be done with class level methods.
+
+Encapsulating private behaviour is not as easy as using the **private** section. You need to send the private message to the new accessor module with a list of methods to make private. 
+
+Example: 
+
+```ruby
+class AutoComplete < PageObject::Elements::TextField
+
+	def self.accessor_methods(accessor, name)
+
+		accessor.send :define_method, "#{name}=" do |value|
+	        #code for desired behaviour
+	    end
+
+	    accessor.send :define_method, "#{name}" do |value|
+	        #code for desired behaviour
+	    end
+
+	    #...
+
+	    accessor.send :private, "#{name}", "#{name}="
+
+	end
+end
+```
