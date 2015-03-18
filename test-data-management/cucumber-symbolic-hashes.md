@@ -19,7 +19,9 @@ Scenario: Two
   Given the following employees with middle names exist:
         | First Name | Middle Name | Last Name | Position        |
         | Jane       | Elaine      | Wayne     | VP of Marketing |
+```
 
+```ruby
 Given(/^the following employees exist:$/) do |employee_table|
   employee_table.hashes.each do |employee_hash|
     EmployeeFactory.create(employee_hash['First Name'],
@@ -36,7 +38,9 @@ Given(/^the following employees with middle names exist:$/) do |employee_table|
                                            employee_hash['Position'])
   end
 end
+```
 
+```ruby
 class EmployeeFactory
  
   def self.create(first_name,last_name,position = "Software Developer")
@@ -70,7 +74,7 @@ FactoryGirl.define do
 end
 ```
 
-*Please forgive the overly simple example, but I wanted to express the value that I see in this approach with a concrete example, and couldn't use an example from the code base I am currently working in.
+*Please forgive the overly simple example, but I wanted to express the value that I see in this approach with a concrete example, and couldn't use an example from the code base I am currently working in.*
 
 The issues I saw with this approach/pattern were: 
 The default values for the factory were divided between two places.
@@ -79,7 +83,7 @@ The mapping of ["Key"] to [:key] seemed to be redundant.
 The number of methods needed to support a single table seemed too high. 
 It was quickly becoming a mess, and hard to understand. 
 
-A New Approach
+##A New Approach
 
 After fumbling through multiple approaches, and talking it through with teammates (Shout out to @RandyEppinger and @Apprentice), I finally found an approach that I thought would work.
 
@@ -118,13 +122,18 @@ Scenario: Two
   Given the following employees exist:
     | First Name | Middle Name | Last Name | Position        |
     | Jane       | Elaine      | Wayne     | VP of Marketing |
+ ```
  
+ 
+ ```ruby
 Given(/^the following employees exist:$/) do |employee_table|
   employee_table.symbolic_hashes.each do |employee_hash|
     EmployeeFactory.create_from(employee_hash)
   end
 end
+```
 
+```ruby
 class EmployeeFactory
  
   #now only one method is needed
