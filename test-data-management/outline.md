@@ -1,4 +1,4 @@
-# Test Data Management 
+# Acceptance Test Data Arrangement
 
 ## Seed Data vs Mutatable Data
 
@@ -6,7 +6,6 @@
 
 ## Only specify the data you are testing
 
-## 
 
 ## Factory Girl
 
