@@ -34,31 +34,48 @@
 
 			<div class="slides">
 				<section data-markdown>
-					![alt text](http://www.gravatar.com/avatar/92bacac7fc45524d4d826e72824ec3c1.png "Logo Title Text 1")
+						##Acceptance Test Data Arrangement
+				</section>
+				<section data-markdown>
+					![](http://www.gravatar.com/userimage/46362193/99919e5b32516b28b841ce3ccc67908b.png?size=300px)
+					![](https://avatars2.githubusercontent.com/u/387604?v=3&s=200)
 
-					@dougmorgan_
+					@dougmorgan_ 
 
 					github: dmorgan3405
 				</section>
+
+				<section data-markdown>
+					##Tools of the trade
+
+					- Cucumber
+					- FactoryGirl
+					- ActiveRecord
+				</section>
+				
 				<section>
-
-					<section data-markdown>
-						##Acceptance Test Data Arrangement
-					</section>
-
 					<section data-markdown>
 						##Seed Data
-					</section>
 
+						- Not mutated at anypoint during the test suite
+						- Inserted once, at the very start of the test suite
+					</section>
 					<section data-markdown>
 						##Test Data
+
+						- Used within a single scenario
+						- Inserted right before the scenario runs
+						- Deleted immediatley after
+					</section>
+					<section data-markdown>
+						##Specify test data that matters. 
+
+						Use defaults for the rest. 
 					</section>
 				</section>	
 				<section>
 					<section data-markdown>
-						##Tools of the trade 
-						- FactoryGirl
-						- ActiveRecord
+						##
 					</section>
 				</section>
 			</div>
