@@ -45,39 +45,286 @@
 					github: dmorgan3405
 				</section>
 
-				<section data-markdown>
-					##Tools of the trade
-
-					- Cucumber
-					- FactoryGirl
-					- ActiveRecord
-				</section>
-				
 				<section>
 					<section data-markdown>
-						##Seed Data
-
-						- Not mutated at anypoint during the test suite
-						- Inserted once, at the very start of the test suite
+						##First, lets get on the same page
 					</section>
 					<section data-markdown>
-						##Test Data
+						##Tools of the trade
 
-						- Used within a single scenario
-						- Inserted right before the scenario runs
-						- Deleted immediatley after
+						- Cucumber
+						- FactoryGirl
+						- ActiveRecord	
 					</section>
 					<section data-markdown>
-						##Specify test data that matters. 
+					##Scenario Example
+					```ruby 
+						  Scenario: Buying the last pop
+						    Given there is 1 pop left in the machine
+						    And a $1.50 has been 
+						    When I choose to buy a pop
+						    Then a pop should be dispensed
+					```
+					</section>
+					<section> 
+						Lets focus on the Given
+					</section>
+					<section  data-markdown>
+						###According to the Cucumber Github Wiki:
 
-						Use defaults for the rest. 
+						***"The purpose of givens is to put the system in a known state before the user (or external system) starts interacting with the system (in the When steps)."***
 					</section>
 				</section>	
 				<section>
 					<section data-markdown>
-						##
+						##Philosophy
+					</section>
+					<section data-markdown>
+						##Seed Data
+						* Not mutated at anypoint during the test suite
+						* Added to the database at the very start of the test suite
+					</section>
+
+					<section data-markdown>
+						###Use Seed Data for system data only
+					</section>
+					<section data-markdown>
+						##Test Data
+						* Inserted within the context scenario (Aka. In the Given)
+						* Deleted immediatley after
+					</section>
+					<section data-markdown>
+						###Use cucumber tables to allow  multiple records to be inserted
+					</section>
+					<section data-markdown>
+						###Only specify test data that matters. 
+					</section>
+					<section data-markdown>
+						###Default the rest with FactoryGirl.
+					</section>
+					<section data-markdown>
+						###To much context?
+						```ruby
+						Scenario: Search by title
+						    Given the following movies are available:
+						      | Title                 | Director          | Box Office    |
+						      | Batman Begins         | Christopher Nolan | 374.2 million |
+						      | The Dark Knight       | Christopher Nolan | 1.005 billion |
+						      | The Dark Knight Rises | Christopher Nolan | 1.084 billion |
+						    When I search for a movie titled "Dark Knight"
+						    Then the search results include the following movies:
+						      | Title                 |
+						      | The Dark Knight       |
+						      | The Dark Knight Rises |
+						```
+					</section>
+					<section data-markdown>
+						###Simpler?
+						```ruby
+						 Scenario: Search by title
+						    Given the following movies are available:
+						      | Title                 |
+						      | Batman Begins         |
+						      | The Dark Knight       |
+						      | The Dark Knight Rises |
+						    When I search for a movie titled "Dark Knight"
+						    Then the search results include the following movies:
+						      | Title                 |
+						      | The Dark Knight       |
+						      | The Dark Knight Rises |
+						```
 					</section>
 				</section>
+
+				<section>
+					<section data-markdown>
+						Lets Talk Implementation With.
+
+						##FactoryGirl
+					</section>
+					<section data-markdown>
+						###Scenario
+						```ruby
+						    Scenario: Search by title
+							    Given the following movies are available:
+							      | Title                 |
+							      | Batman Begins         |
+							      | The Dark Knight       |
+							      | The Dark Knight Rises |
+							    When I search for a movie titled "Dark Knight"
+							    Then the search results include the following movies:
+							      | Title                 |
+							      | The Dark Knight       |
+							      | The Dark Knight Rises |
+						```
+					</section>
+					<section data-markdown>
+						###Step Def and Factory
+						```ruby
+						    Given(/^the following movies are available:$/) do |movies_table|
+							  movies_table.hashes.each do |movie_hash|
+							    FactoryGirl.create(:movie, { name: movie_hash["Title"]})
+							  end
+							end
+
+							FactoryGirl.define do
+							  factory :movie do
+							    title "Test Data Movie III"
+							    director_id  99
+							    box_office "400 Million"
+							  end
+							end
+						```
+					</section>
+					<section data-markdown>
+						###Adding the next scenarios
+					</section>
+					<section data-markdown>
+						###Search by year released
+						```ruby
+						Scenario: Search by year released
+						    Given the following movies are available:
+						      | Title                 | Year Released |
+						      | Batman Begins         | 2005          |
+						      | The Dark Knight       | 2008          |
+						      | The Dark Knight Rises | 2012          |
+						    When I search for movies released in "2005"
+						    Then the search results include the following movies:
+						      | Title                 |
+						      | Batman Begins         |
+						```
+					</section>
+					<section data-markdown>
+					###Search by director
+					```ruby
+					Scenario: Search by director
+					    Given the following movies are available:
+					      | Title                 | Director          | Box Office    |
+					      | Batman Begins         | Christopher Nolan | 374.2 million |
+					      | The Dark Knight       | Christopher Nolan | 1.005 billion |
+					      | The Dark Knight Rises | Christopher Nolan | 1.084 billion |
+					    When I search for movies directed by "Christopher Nolan"
+					    Then the search results include the following movies:
+					      | Title                 |
+					      | Batman Begins         |
+					      | The Dark Knight       |
+					      | The Dark Knight Rises |
+					```
+					</section>
+					<section data-markdown>
+						###Step Def
+						```ruby
+						Given(/^the following movies are available:$/) do |movies_table|
+						  movies_table.hashes.each do |movie_hash|
+						    MovieFactory.create_movie(movie_hash["Title"],movie_hash["Year Released"])
+						  end
+						end
+						```
+					</section>
+					<section data-markdown>
+						###Factory Code
+						```ruby
+						class MovieFactory
+						  def self.create_movie(movie_hash)
+						    year_released = movie_hash["Year Released"] || 2015
+						    director = Director.find_by(name: movie_hash["Director"])
+						    director_id = director ? director.id : 99
+						    FactoryGirl.create(:movie, { name: movies_table["Name"], director_id: director_id, year_released: year_released})
+						  end
+						end
+
+						FactoryGirl.define do
+						  factory :movie do
+						    title "Test Data Movie III"
+						    director_id  99
+						    box_office "400 Million"
+						  end
+						end
+						```
+					</section>
+					<section data-markdown>
+						###Issues I have with with this code. 
+
+						* The default values are divided between two places.
+						* The mapping of ["Key"] to [:key] seems to be redundant. 
+						* It is quickly becoming a mess, and hard to understand. 
+					</section>
+					<section data-markdown>
+						##How can we let FactoryGirl do the heavy lifting?
+					</section>
+					<section data-markdown>
+						```ruby
+						gem cucumber-symbolic-hashes
+						```
+					</section>
+					<section data-markdown>
+						```ruby
+						class Cucumber::Ast::Table
+						 
+						  def symbolic_hashes
+						    @header_conversion_proc = lambda {|h| symbolize_key(h)}
+						    @symbolic_hashes ||= build_hashes
+						  end
+						 
+						  private
+						 
+						  def symbolize_key(key)
+						    key.downcase.gsub(' ','_').to_sym
+						  end
+						 
+						end
+						```
+					</section>
+					<section data-markdown>
+					###New Step Def
+					```ruby
+					Given(/^the following movies are available:$/) do |movies_table|
+					  movies_table.symbolic_hashes.each do |movie_hash|
+					    MovieFactory.create_movie(movie_hash)
+					  end
+					end
+					```
+					</section>
+					<section data-markdown>
+					###New Factory Code
+					```ruby
+					class MovieFactory
+					  def self.create_movie(movie_hash)
+					    FactoryGirl.create(:movie, movie_hash)
+					  end
+					end
+
+					FactoryGirl.define do
+					  transient do
+					    director "Default Director"
+					  end
+					  factory :movie do
+					    title "Test Data Movie III"
+					    director_id  {Director.find_by(name: director)}.director_id
+					    box_office "400 Million"
+					    year_released "2015"
+					  end
+					end
+					```
+					</section>
+				</section>
+				<section data-markdown>
+				##The pros.
+
+				* Write only a very thin factory layer, by taking full advantage of the functionality of Factory Girl.
+				* In my opinion, the flexibility of this approach allows for scenarios to be added quicker and easier. 
+				</section>
+				<section data-markdown>
+				##The cons.
+
+				* Promotes tight coupling of cucumber table headers to database column names.
+				* Team members need to understand how lazy and transient attributes work in FactoryGirl. 
+				</section>
+				
+				<section data-markdown>
+					Questions?
+				</section>
+
 			</div>
 
 		</div>
