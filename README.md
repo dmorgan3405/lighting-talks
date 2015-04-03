@@ -1,5 +1,5 @@
 #lightning-talks
 
-Repo for draft of blog posts and lighting talks that are work in progress. 
+Repo for rough drafts of potential blog posts and lighting talks that are a work in progress. 
 
 
