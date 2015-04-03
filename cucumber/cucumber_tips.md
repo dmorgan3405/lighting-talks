@@ -57,7 +57,12 @@ Next calling flatten removes the layers from the array, so it will become an arr
 
 Now I am able to return an array of strings from my page, and verify my array contains the expected results in anyorder, using the =~ rpsec matcher.
 
-#So what happens when the arrays don't match?
+#=~ 
+
+* Order does NOT matter
+* Arrays must be equivalent. 
+
+##So what happens when the arrays don't match?
 
 When you have an extra item in the expected array:
 
