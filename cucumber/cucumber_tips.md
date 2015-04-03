@@ -62,7 +62,8 @@ Now I am able to return an array of strings from my page, and verify my array co
 When you have an extra item in the expected array:
 
 ```ruby
-RSpec::Expectations::ExpectationNotMetError: expected collection contained:  ["Emerald Green", "Sky Blue Green"]
+RSpec::Expectations::ExpectationNotMetError: 
+expected collection contained:  ["Emerald Green", "Sky Blue Green"]
 actual collection contained:    ["Emerald Green", "Olive Green", "Sky Blue Green"]
 the extra elements were:        ["Olive Green"]
 ```
@@ -70,5 +71,6 @@ the extra elements were:        ["Olive Green"]
 When you are missing an item from the expected array:
 
 ```ruby
-RSpec::Expectations::ExpectationNotMetError: expected ["Sky Blue Green", "Emerald Green"] to include "Olive Green"
+RSpec::Expectations::ExpectationNotMetError: 
+expected ["Sky Blue Green", "Emerald Green"] to include "Olive Green"
 ```
