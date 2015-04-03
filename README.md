@@ -1,5 +1,5 @@
 #lightning-talks
 
-Repo for Lightning Talk presentations and code examples
+Repo for draft of blog posts and lighting talks that are work in progress. 
 
-Hopefully more to come shortly!
+
