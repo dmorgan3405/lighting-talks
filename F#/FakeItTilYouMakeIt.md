@@ -1,4 +1,4 @@
 #FAKE it till you MAKE it
   Fake (F# Make) is a domain-specific language, written in F#, to help developers easily automate build tasks in the .NET stack.
-  This session will explore better ways to script common build task, using FAKE to simplify them and integrate them into build pipelines.
-  Come explore a .NET world where build scripts can be easy to read and checked into source control.
+  We'll look at scripting common build and deployment tasks using FAKE, from cleaning build directories to spinning up and deploying to an IIS site.
+  Don't speak F#? No worries! FAKE provides a clear domain-specific language to work with so no experienced required. However it is a great way to dip your toes in the F# water, even in and enterprise! Come join and explore a .NET world where build scripts can be both easy to read and checked into source control.
