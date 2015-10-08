@@ -1,26 +1,25 @@
 #Preventing Inconsistencies
 
-A list of things to keep in mind. Not RULES. 
+This is a list of things to keep in mind. Not a list of RULES. 
 
 ## Dealing with javascript heavy ui-controls
 
-element.when_visible seems to be more restrictive then element.when_present
+element.when_visible seems to be more restrictive than element.when_present
 
 * Important for Kendo UI Modals
 
 ## Using the Page Object Api
 
-Beinging familiar with the PageObject api and using the provided methods.
+Be familiar with the PageObject api and using the provided methods.
 
 Example from code:
 
 wait_until { my_element.attribute('disabled') == nil} 
 
-Some assumptions were made. 
-* When the attribute disabled does not exists, that it would return nil. 
+* An assumption was made that this call would return nil if the element does not have the disabled attribute. 
 * It actualy will return empty string. 
 
-Use:
+Instead Use:
 wait_until { my_element.disabled? }
 
 It it a little simpler and also it also protects us as developers from having to know what the underlying watir driver is actually returning. 
@@ -29,7 +28,7 @@ It it a little simpler and also it also protects us as developers from having to
 
 Widgets allow us to encapsulate generic behaviour of ui controls. 
 
-For example, always clicking a kendo select list opener and waiting for the options container to be visible before you select a value. 
+For example, clicking a kendo select list opener and waiting for the options container to be visible before you select a value. 
 
 Some things to keep in mind when:
 
@@ -45,9 +44,9 @@ Some things to keep in mind when:
 
 Try to only access the values once per step. 
 
-It is much faster to get the values, filter the values, and compare the values. 
+Fast: get the values, filter the values, and compare the values. 
 
-Than, search the table for a specific value, then compare the values. 
+Slow: search the table for a specific value, then compare the values.
 
 Using the == [order matters] and ~= [order does not matter] rspec matchers can help with this. 
 
